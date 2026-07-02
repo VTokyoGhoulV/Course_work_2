@@ -1,6 +1,6 @@
 import pytest
 
-from src.classes import APIAdapter, AeroplanesAPI, BaseAPIAdapter
+from src.classes import AeroplanesAPI, APIAdapter, BaseAPIAdapter
 
 
 class FakeResponse:

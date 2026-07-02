@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from src.utils import find_project_root, user_interaction

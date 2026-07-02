@@ -1,5 +1,5 @@
 from src.classes import Aeroplane, AeroplanesAPI, JsonSaver
-from src.utils import user_interaction, print_aeroplanes
+from src.utils import print_aeroplanes, user_interaction
 
 country, top_n, filter_words, altitude_range = user_interaction()
 

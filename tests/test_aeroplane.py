@@ -156,7 +156,16 @@ def test_sort_by_velocity_returns_planes_descending(aeroplane_factory) -> None:
     assert result == [fast, middle, slow]
 
 
-@pytest.mark.parametrize("method_name", ["sort_by_altitude", "sort_by_velocity", "get_top_n_aeroplanes", "filter_aeroplanes", "filter_aeroplanes_by_altitude"])
+@pytest.mark.parametrize(
+    "method_name",
+    [
+        "sort_by_altitude",
+        "sort_by_velocity",
+        "get_top_n_aeroplanes",
+        "filter_aeroplanes",
+        "filter_aeroplanes_by_altitude",
+    ],
+)
 def test_list_methods_return_empty_list_for_empty_input(method_name: str) -> None:
     method = getattr(Aeroplane, method_name)
 
@@ -172,13 +181,16 @@ def test_list_methods_return_empty_list_for_empty_input(method_name: str) -> Non
     assert result == []
 
 
-@pytest.mark.parametrize("method_name,args", [
-    ("sort_by_altitude", ()),
-    ("sort_by_velocity", ()),
-    ("get_top_n_aeroplanes", (3,)),
-    ("filter_aeroplanes", (["Belarus"],)),
-    ("filter_aeroplanes_by_altitude", ("1000-2000",)),
-])
+@pytest.mark.parametrize(
+    "method_name,args",
+    [
+        ("sort_by_altitude", ()),
+        ("sort_by_velocity", ()),
+        ("get_top_n_aeroplanes", (3,)),
+        ("filter_aeroplanes", (["Belarus"],)),
+        ("filter_aeroplanes_by_altitude", ("1000-2000",)),
+    ],
+)
 def test_list_methods_reject_non_aeroplane_items(method_name: str, args: tuple) -> None:
     method = getattr(Aeroplane, method_name)
 
@@ -245,6 +257,7 @@ def test_aeroplane_comparison_by_altitude(aeroplane_factory) -> None:
     high = aeroplane_factory(icao24="ABC002", baro_altitude=10_000)
     assert low < high
     assert high > low
+
 
 def test_aeroplane_comparison_by_velocity(aeroplane_factory) -> None:
     slow = aeroplane_factory(icao24="ABC001", velocity=100)

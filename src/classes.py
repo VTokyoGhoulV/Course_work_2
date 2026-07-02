@@ -44,7 +44,7 @@ class APIAdapter(BaseAPIAdapter):
         try:
             response = get(
                 url=self.openstreetmap_url,
-                params=params_nominatim, #type: ignore
+                params=params_nominatim,  # type: ignore
                 headers=headers_nominatim,
             )
 
@@ -59,7 +59,6 @@ class APIAdapter(BaseAPIAdapter):
         if not data:
             print(f"Страна {country} не найдена.")
             return {}
-
 
         # Пример ответа от nominatim.openstreetmap можно посмотреть в задании курсовой.
         geo_coordinates = data[0].get("boundingbox")
@@ -76,13 +75,14 @@ class APIAdapter(BaseAPIAdapter):
 
             # Пример ответа от opensky-network можно посмотреть в задании курсовой.
             aeroplanes = response.json()
-            return aeroplanes #type: ignore
+            return aeroplanes  # type: ignore
         except requests.RequestException as e:
             print(f"Error while requesting opensky-network.org: {e}")
             return {}
         except json.JSONDecodeError as e:
             print(f"Error while decoding JSON: {e}")
             return {}
+
 
 class AeroplanesAPI(APIAdapter):
 
@@ -240,17 +240,18 @@ class Aeroplane:
             return []
         if not all(isinstance(p, Aeroplane) for p in planes):
             raise TypeError("All elements must be Aeroplane objects")
-        altitude_range = [int(x) for x in altitude_range.split("-")] # type: ignore
+        altitude_range = [int(x) for x in altitude_range.split("-")]  # type: ignore
         return [p for p in planes if altitude_range[0] <= p.baro_altitude <= altitude_range[1]]
 
-
-    def __lt__(self, other):
+    def __lt__(self, other: Aeroplane) -> bool:
         return (self.velocity or 0, self.baro_altitude or 0) < (other.velocity or 0, other.baro_altitude or 0)
 
-    def __gt__(self, other):
+    def __gt__(self, other: Aeroplane) -> bool:
         return (self.velocity or 0, self.baro_altitude or 0) > (other.velocity or 0, other.baro_altitude or 0)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Aeroplane):
+            return NotImplemented
         return (self.velocity or 0, self.baro_altitude or 0) == (other.velocity or 0, other.baro_altitude or 0)
 
 
@@ -259,7 +260,7 @@ class BaseJsonSaver(ABC):
 
     @staticmethod
     @abstractmethod
-    def add_aeroplane(data: list) -> None:
+    def add_aeroplane(aeroplane: Aeroplane) -> None:
         """Сохраняет данные в файл"""
 
     @staticmethod
@@ -269,7 +270,7 @@ class BaseJsonSaver(ABC):
 
     @staticmethod
     @abstractmethod
-    def delete_aeroplane(data: list) -> None:
+    def delete_aeroplane(aeroplane: Aeroplane) -> None:
         """Удаляет данные из файла"""
 
 
@@ -294,7 +295,7 @@ class JsonSaver(BaseJsonSaver):
     @staticmethod
     def load() -> list:
         with open(f"{find_project_root()}/data/data.json", "r", encoding="utf-8") as f:
-            return json.load(f) # type: ignore
+            return json.load(f)  # type: ignore
 
     @staticmethod
     def delete_aeroplane(aeroplane: Aeroplane) -> None:
