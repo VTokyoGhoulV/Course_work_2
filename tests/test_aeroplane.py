@@ -238,3 +238,16 @@ def test_filter_aeroplanes_by_altitude_rejects_invalid_range(aeroplane_factory, 
 
     with pytest.raises((ValueError, IndexError)):
         Aeroplane.filter_aeroplanes_by_altitude([plane], bad_range)
+
+
+def test_aeroplane_comparison_by_altitude(aeroplane_factory) -> None:
+    low = aeroplane_factory(icao24="ABC001", baro_altitude=1_000)
+    high = aeroplane_factory(icao24="ABC002", baro_altitude=10_000)
+    assert low < high
+    assert high > low
+
+def test_aeroplane_comparison_by_velocity(aeroplane_factory) -> None:
+    slow = aeroplane_factory(icao24="ABC001", velocity=100)
+    fast = aeroplane_factory(icao24="ABC002", velocity=500)
+    assert slow < fast
+    assert fast > slow

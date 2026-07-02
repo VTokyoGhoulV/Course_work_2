@@ -3,6 +3,7 @@ import os.path
 from abc import ABC, abstractmethod
 from typing import Iterator
 
+import requests
 from requests import get
 
 from src.utils import find_project_root
@@ -40,13 +41,25 @@ class APIAdapter(BaseAPIAdapter):
             "limit": 1,
         }
 
-        response = get(
-            url=self.openstreetmap_url,
-            params=params_nominatim, #type: ignore
-            headers=headers_nominatim,
-        )
+        try:
+            response = get(
+                url=self.openstreetmap_url,
+                params=params_nominatim, #type: ignore
+                headers=headers_nominatim,
+            )
 
-        data = response.json()
+            data = response.json()
+        except requests.RequestException as e:
+            print(f"Error while requesting nominatim.openstreetmap.org: {e}")
+            return {}
+        except json.JSONDecodeError as e:
+            print(f"Error while decoding JSON: {e}")
+            return {}
+
+        if not data:
+            print(f"Страна {country} не найдена.")
+            return {}
+
 
         # Пример ответа от nominatim.openstreetmap можно посмотреть в задании курсовой.
         geo_coordinates = data[0].get("boundingbox")
@@ -58,13 +71,18 @@ class APIAdapter(BaseAPIAdapter):
             "lomin": geo_coordinates[2],
             "lomax": geo_coordinates[3],
         }
+        try:
+            response = get(url=self.opensky_url, params=params)
 
-        response = get(url=self.opensky_url, params=params)
-
-        # Пример ответа от opensky-network можно посмотреть в задании курсовой.
-        aeroplanes = response.json()
-        return aeroplanes #type: ignore
-
+            # Пример ответа от opensky-network можно посмотреть в задании курсовой.
+            aeroplanes = response.json()
+            return aeroplanes #type: ignore
+        except requests.RequestException as e:
+            print(f"Error while requesting opensky-network.org: {e}")
+            return {}
+        except json.JSONDecodeError as e:
+            print(f"Error while decoding JSON: {e}")
+            return {}
 
 class AeroplanesAPI(APIAdapter):
 
@@ -226,12 +244,22 @@ class Aeroplane:
         return [p for p in planes if altitude_range[0] <= p.baro_altitude <= altitude_range[1]]
 
 
+    def __lt__(self, other):
+        return (self.velocity or 0, self.baro_altitude or 0) < (other.velocity or 0, other.baro_altitude or 0)
+
+    def __gt__(self, other):
+        return (self.velocity or 0, self.baro_altitude or 0) > (other.velocity or 0, other.baro_altitude or 0)
+
+    def __eq__(self, other):
+        return (self.velocity or 0, self.baro_altitude or 0) == (other.velocity or 0, other.baro_altitude or 0)
+
+
 class BaseJsonSaver(ABC):
     """Абстрактный класс для сохранения данных в файл"""
 
     @staticmethod
     @abstractmethod
-    def save(data: list) -> None:
+    def add_aeroplane(data: list) -> None:
         """Сохраняет данные в файл"""
 
     @staticmethod
@@ -241,7 +269,7 @@ class BaseJsonSaver(ABC):
 
     @staticmethod
     @abstractmethod
-    def delete(data: list) -> None:
+    def delete_aeroplane(data: list) -> None:
         """Удаляет данные из файла"""
 
 

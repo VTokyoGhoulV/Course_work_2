@@ -1,5 +1,5 @@
 from src.classes import Aeroplane, AeroplanesAPI, JsonSaver
-from src.utils import user_interaction
+from src.utils import user_interaction, print_aeroplanes
 
 country, top_n, filter_words, altitude_range = user_interaction()
 
@@ -13,5 +13,7 @@ ranged_aeroplanes = Aeroplane.filter_aeroplanes_by_altitude(filtered_aeroplanes,
 
 sorted_aeroplanes = Aeroplane.sort_by_altitude(ranged_aeroplanes)
 top_aeroplanes = Aeroplane.get_top_n_aeroplanes(sorted_aeroplanes, top_n)
+print_aeroplanes(top_aeroplanes)
+
 for plane in top_aeroplanes:
     JsonSaver.add_aeroplane(plane)

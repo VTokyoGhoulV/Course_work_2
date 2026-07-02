@@ -20,3 +20,20 @@ def find_project_root(marker_files: str | tuple = ("pyproject.toml", ".git", "re
             if (parent / marker).exists():
                 return parent
     raise RuntimeError("Не удалось найти корень проекта. Убедитесь, что один из маркерных файлов присутствует.")
+
+
+def print_aeroplanes(aeroplanes: list) -> None:
+    """
+    Выводит список самолетов в консоль.
+    """
+    if not aeroplanes:
+        print("Нет самолетов")
+        return
+    print(f"Найдено {len(aeroplanes)} самолетов:")
+    for plane in aeroplanes:
+        print(
+            f"Позывной: {plane.callsign} "
+            f"страна: {plane.country} "
+            f"скорость: {plane.velocity} "
+            f"высота: {plane.baro_altitude}"
+        )

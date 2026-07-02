@@ -18,11 +18,6 @@ def test_base_json_saver_is_abstract() -> None:
         BaseJsonSaver()
 
 
-def test_json_saver_is_not_instantiable_while_save_and_delete_are_abstract() -> None:
-    with pytest.raises(TypeError):
-        JsonSaver()
-
-
 def test_add_aeroplane_writes_plane_to_json(tmp_path, monkeypatch, sample_plane) -> None:
     data_file = _prepare_data_file(tmp_path)
     monkeypatch.setattr("src.classes.find_project_root", lambda: tmp_path)
